@@ -1,0 +1,17 @@
+{ 
+  "name" : "rtf",
+  "version" : "0.0.1",
+  "description" : "Assists with creating rich text documents.",
+  "main" : "./lib/rtf.js",
+  "author" : "Jonathan Rowny",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/jrowny/node-rtf.git"
+  },
+  "keywords": [
+    "rtf",
+    "rich text",
+    "documents"
+  ],
+  "license" : "MIT"
+ }
