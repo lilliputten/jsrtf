@@ -13,5 +13,8 @@
     "rich text",
     "documents"
   ],
-  "license" : "MIT"
+  "license" : "MIT",
+  "dependencies": {
+    "underscore" : "~1"
+  }
  }
