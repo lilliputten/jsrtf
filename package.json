@@ -1,6 +1,6 @@
 { 
   "name" : "rtf",
-  "version" : "0.0.2",
+  "version" : "0.0.3",
   "description" : "Assists with creating rich text documents.",
   "main" : "./lib/rtf.js",
   "author" : "Jonathan Rowny",
@@ -15,6 +15,6 @@
   ],
   "license" : "MIT",
   "dependencies": {
-    "underscore" : "~1"
+    "async" : "~0"
   }
  }

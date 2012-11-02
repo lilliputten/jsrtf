@@ -21,9 +21,11 @@ table2.setData([
 //adding a row to an existing data set
 table2.addRow(["Banana", "$0.12", "1"]);
 
-myDoc.addTable(table2);
-var output = myDoc.createDocument();
-console.log(output);
-fs.writeFile('table-sample.rtf', output, function (err) {
-  if (err) return console.log(err);
-});
+myDoc.createDocument(
+    function(err, output){
+        console.log(output);
+        fs.writeFile('table-sample.rtf', output, function (err) {
+          if (err) return console.log(err);
+        });
+    }
+);

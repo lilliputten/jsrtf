@@ -1,18 +1,21 @@
 var rtf = require('../lib/rtf'),
     Format = require('../lib/format'),
-    Utils = require('../lib/rtf-utils'),
+    Colors = require('../lib/colors'),
     fs  = require('fs');
 var myDoc = new rtf(),
     format = new Format();
 
-format.color = Utils.Colors.ORANGE;
+format.color = Colors.ORANGE;
 myDoc.writeText("Happy Halloween", format);
 myDoc.addPage();
 myDoc.addLine();
 myDoc.addTab();
 myDoc.writeText("Trick or treat!");
-var output = myDoc.createDocument();
-console.log(output);
-fs.writeFile('halloween.rtf', output, function (err) {
-  if (err) return console.log(err);
-});
+myDoc.createDocument(
+    function(err, output){
+        console.log(output);
+        fs.writeFile('halloween.rtf', output, function (err) {
+          if (err) return console.log(err);
+        });
+    }
+);
