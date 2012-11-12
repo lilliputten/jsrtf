@@ -1,6 +1,6 @@
 { 
   "name" : "rtf",
-  "version" : "0.0.3",
+  "version" : "0.0.4",
   "description" : "Assists with creating rich text documents.",
   "main" : "./lib/rtf.js",
   "author" : "Jonathan Rowny",
