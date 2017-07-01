@@ -1,21 +1,28 @@
-{ 
-  "name" : "rtf",
-  "version" : "0.0.4",
-  "description" : "Assists with creating rich text documents.",
-  "main" : "./lib/rtf.js",
-  "author" : "Jonathan Rowny",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/jrowny/node-rtf.git"
+{
+  "name": "rtf",
+  "version": "0.0.4",
+  "description": "Assists with creating rich text documents.",
+  "main": "./lib/rtf.js",
+  "author": "Jonathan Rowny",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jrowny/node-rtf.git"
   },
   "keywords": [
     "rtf",
     "rich text",
     "documents"
   ],
-  "license" : "MIT",
+  "license": "MIT",
   "dependencies": {
-    "async" : "~0",
-    "imageinfo" : "~1"
+    "async": "~0",
+    "imageinfo": "~1",
+    "inherit": "^2.2.6"
+  },
+  "devDependencies": {
+    "fs-extra": "^3.0.1"
+  },
+  "scripts": {
+    "demo": "node demo/test.js && start demo/.results/demo.rtf"
   }
- }
+}
