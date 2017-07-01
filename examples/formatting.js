@@ -45,7 +45,9 @@ myDoc.createDocument(
     function(err, output){
         console.log(output);
         fs.writeFile('formatting.rtf', output, function (err) {
-          if (err) return console.log(err);
+          if (err) {
+              return console.log(err);
+          }
         });
     }
 );

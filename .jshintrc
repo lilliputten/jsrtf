@@ -6,13 +6,10 @@
     "freeze": false,
     "futurehostile": true,
     "latedef": "nofunc",
-    "maxdepth": 2,
-    "maxparams": 3,
     "noarg": true,
     "nocomma": true,
     "nonbsp": true,
     "nonew": true,
-    "singleGroups": true,
     "undef": true,
     "unused": true,
 

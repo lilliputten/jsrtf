@@ -10,7 +10,9 @@ myDoc.createDocument(
     function(err, output){
         //console.log(output); //that's a little much to output to the console
         fs.writeFile('image.rtf', output, function (err) {
-          if (err) return console.log(err);
+          if (err) {
+              return console.log(err);
+          }
         });
     }
 );
