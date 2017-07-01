@@ -34,21 +34,13 @@ myDoc.addTable(table2);
 
 // writing file
 var resultFile = __dirname + '/.results/demo.rtf';
-myDoc.createDocument(
-    function(error, output){
-        if ( !error ) {
-            fs.ensureDirSync(path.dirname(resultFile));
-            fs.writeFile(resultFile, output, function (error) {
-                if ( !error ) {
-                    console.info('Created file ' + resultFile);
-                }
-                else {
-                    console.error(error);
-                }
-            });
-        }
-        else {
-            console.error(error);
-        }
+var content = myDoc.createDocument();
+fs.ensureDirSync(path.dirname(resultFile));
+fs.writeFile(resultFile, content, function (error) {
+    if ( !error ) {
+        console.info('Created file ' + resultFile);
     }
-);
+    else {
+        console.error(error);
+    }
+});

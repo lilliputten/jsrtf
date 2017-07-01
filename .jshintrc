@@ -1,0 +1,26 @@
+{
+    "bitwise": true,
+    "curly": true,
+    "eqeqeq": true,
+    "forin": true,
+    "freeze": false,
+    "futurehostile": true,
+    "latedef": "nofunc",
+    "maxdepth": 2,
+    "maxparams": 3,
+    "noarg": true,
+    "nocomma": true,
+    "nonbsp": true,
+    "nonew": true,
+    "singleGroups": true,
+    "undef": true,
+    "unused": true,
+
+    "mocha": true,
+    "node": true,
+
+    "laxbreak": true,
+    "expr": true,
+
+    "esversion": 6
+}
