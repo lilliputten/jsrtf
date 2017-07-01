@@ -4,16 +4,16 @@
  */
 
 var
-    // RGB = require('./rgb'),
-    Element = require('./elements/element'),
-    // Format = require('./format'),
-    Utils = require('./rtf-utils'),
-    Language = require('./language'),
-    Orientation = require('./orientation'),
-    TextElement = require('./elements/text'),
-    GroupElement = require('./elements/group'),
+    // RGB = require('./lib/rgb'),
+    Element = require('./lib/elements/element'),
+    // Format = require('./lib/format'),
+    Utils = require('./lib/rtf-utils'),
+    Language = require('./lib/language'),
+    Orientation = require('./lib/orientation'),
+    TextElement = require('./lib/elements/text'),
+    GroupElement = require('./lib/elements/group'),
     async = require('async'),
-    Options = require('./options'),
+    Options = require('./lib/options'),
 
     NL = '\n'
 ;

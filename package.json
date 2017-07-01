@@ -2,11 +2,11 @@
   "name": "rtf",
   "version": "0.0.4",
   "description": "Assists with creating rich text documents.",
-  "main": "./lib/rtf.js",
+  "main": "rtf.js",
   "author": "Jonathan Rowny",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jrowny/node-rtf.git"
+    "url": "https://github.com/lilliputten/node-rtf"
   },
   "keywords": [
     "rtf",
@@ -23,6 +23,7 @@
     "fs-extra": "^3.0.1"
   },
   "scripts": {
+    "lint": "jshint .",
     "demo": "node demo/test.js && start demo/.results/demo.rtf"
   }
 }
