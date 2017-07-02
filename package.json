@@ -1,12 +1,12 @@
 {
-  "name": "rtf",
-  "version": "0.0.4",
+  "name": "jsrtf",
+  "version": "0.0.1",
   "description": "Assists with creating rich text documents.",
   "main": "rtf.js",
-  "author": "Jonathan Rowny",
+  "author": "lilliputten <igor@lilliputten.ru>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lilliputten/node-rtf"
+    "url": "https://github.com/lilliputten/jsrtf"
   },
   "keywords": [
     "rtf",
@@ -15,12 +15,14 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "~0",
     "imageinfo": "~1",
-    "inherit": "^2.2.6"
+    "inherit": "^2.2.6",
+    "vow": "^0.4.16",
+    "ym": "^0.1.2"
   },
   "devDependencies": {
-    "fs-extra": "^3.0.1"
+    "fs-extra": "^3.0.1",
+    "jshint": "^2.9.5"
   },
   "scripts": {
     "lint": "jshint .",

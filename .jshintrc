@@ -11,7 +11,7 @@
     "nonbsp": true,
     "nonew": true,
     "undef": true,
-    "unused": true,
+    "unused": false,
 
     "mocha": true,
     "node": true,
@@ -20,4 +20,5 @@
     "expr": true,
 
     "esversion": 6
+
 }
