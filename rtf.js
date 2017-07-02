@@ -172,43 +172,53 @@ RTF.prototype.createDocument = function (callback) {
         if(this.marginBottom > 0) { output += '\\margb' + this.marginBottom; }
         output += '\\deflang' + this.language;
 
-        var tasks = [];
         var ct = this.colorTable;
         var ft = this.fontTable;
-        this.elements.forEach(function(el) {
-            if (el instanceof Element){
+
+        //now that the tasks are done running: create tables, data populated during element output
+        output += Utils.createColorTable(ct);
+        output += Utils.createFontTable(ft);
+
+        //other options
+        if(this.pageNumbering) {
+            output += '{\\header\\pard\\qr\\plain\\f0\\chpgn\\par}' + NL;
+        }
+        if(this.columns > 0) {
+            output += '\\cols' + this.columns + NL;
+        }
+        if(this.columnLines) {
+            output += '\\linebetcol' + NL;
+        }
+
+        if ( callback ) {
+            var tasks = [];
+            this.elements.forEach(function(el) {
+                if (el instanceof Element){
                     tasks.push(function(cb) { el.getRTFCode(ct, ft, cb); });
-            } else {
+                } else {
                     tasks.push(function(cb) { cb(null, Utils.getRTFSafeText(el)); });
-            }
-        });
-
-        return async.parallel(tasks, function(err, results) {
-            var elementOutput = '';
-            results.forEach(function(result) {
-                     elementOutput += result;
+                }
             });
+            return async.parallel(tasks, function(err, results) {
+                var elementOutput = '';
+                results.forEach(function(result) {
+                         elementOutput += result;
+                });
 
-            //now that the tasks are done running: create tables, data populated during element output
-            output += Utils.createColorTable(ct);
-            output += Utils.createFontTable(ft);
+                //final output
+                output += elementOutput+'}';
 
-            //other options
-            if(this.pageNumbering) {
-                output += '{\\header\\pard\\qr\\plain\\f0\\chpgn\\par}' + NL;
-            }
-            if(this.columns > 0) {
-                output += '\\cols' + this.columns + NL;
-            }
-            if(this.columnLines) {
-                output += '\\linebetcol' + NL;
-            }
-
-            //final output
-            output += elementOutput+'}';
-
-            return callback(null, output);
-        });
+                return callback(null, output);
+            });
+        }
+        else {
+            var elemsContent = this.elements
+                .map(el => ( el instanceof Element ) ? el.getRTFCode(ct, ft) : Utils.getRTFSafeText(el))
+                .join('\n')
+            ;
+            output += elemsContent + '}';
+            return output;
+        }
 };/*}}}*/
 
 module.exports = RTF;
