@@ -25,10 +25,15 @@ else {
 function testRTF (jsRTF) {
 
     // create rtf
-    var myDoc = new jsRTF();
-    myDoc.language = jsRTF.Language.RU;
+    var myDoc = new jsRTF({
+        language : jsRTF.Language.RU,
+    });
 
-    var textFormat = new jsRTF.Format({ makeParagraph : true });
+    var textFormat = new jsRTF.Format({
+        spaceBefore : 300,
+        spaceAfter : 300,
+        paragraph : true,
+    });
     myDoc.writeText('demo', textFormat);
 
     // add table
