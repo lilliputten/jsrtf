@@ -185,14 +185,14 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         var options = new jsRTF.Options(this.params);
         output += options.compile() + NL;
 
-        //now that the tasks are done running: create tables, data populated during element output
-        output += jsRTF.Utils.createColorTable(this.colorTable) + NL;
-        output += jsRTF.Utils.createFontTable(this.fontTable) + NL;
-
         var elemsContent = this.elements
             .map(el => ( el instanceof jsRTF.Element ) ? el.getRTFCode(this.colorTable, this.fontTable) : jsRTF.Utils.getRTFSafeText(el))
             .join('\n')
         ;
+
+        //now that the tasks are done running: create tables, data populated during element output
+        output += jsRTF.Utils.createColorTable(this.colorTable) + NL;
+        output += jsRTF.Utils.createFontTable(this.fontTable) + NL;
 
         output += elemsContent + '\n\}';
 

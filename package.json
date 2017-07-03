@@ -31,7 +31,7 @@
   },
   "scripts": {
     "lint": "jshint .",
-    "unit": "mocha test/"
+    "unit": "mocha test/",
     "test": "npm run lint && npm run unit",
     "demo": "node demo/test.js && start demo/.results/demo.rtf"
   }

@@ -1,36 +1,29 @@
-jsrtf
-=====
 
-An RTF document creation library for javascript.
 
-Based on Jonathan Rowny's [node-rtf](https://github.com/jrowny/node-rtf).
+const resultFile = __dirname + '/.results/simple-test.rtf';
 
-Installation
-------------
+// YM (DEBUG)
+const modules = global.modules = require('ym');
+// Preload modules required by jsRTF (in real emnvironment need to be loaded before using jsRTF)...
+if ( typeof modules === 'object' ) {
+    require('inherit');
+}
 
-```shell
-npm install --save jsrtf
-```
+const jsRTF = require('../jsrtf');
 
-Usage
------
+if ( typeof modules === 'object' ) {
+    console.log('Run demo using YM...');
+    modules.require([
+        'jsrtf',
+    ], testRTF);
+}
+else {
+    console.log('Run demo using commonJS...');
+    testRTF(jsRTF);
+}
 
-Using CommonJS:
-```javascript
-    var jsRTF = require('jsrtf');
-```
-Using YModules:
-```javascript
-    // require('jsrtf'); // if required
-    modules.require(['jsrtf'], (jsRTF) => {
-        // ...
-    });
-```
+function testRTF (jsRTF) {
 
-Creating RTF
-------------
-
-```javascript
     // Create RTF object
     var myDoc = new jsRTF({
         // Language: Russian
@@ -56,7 +49,7 @@ Creating RTF
     // Add table
     var table = new jsRTF.TableElement({
         format : new jsRTF.Format({ tableBorder : 10 }),
-        cellsFormat : [
+        cellsFormats : [
             new jsRTF.Format({ bold : true }), // #0
             new jsRTF.Format({ color : jsRTF.Colors.RED }), // #1
         ],
@@ -70,13 +63,28 @@ Creating RTF
     // Make content...
     var content = myDoc.createDocument();
 
-    // ...
-```
+    // Write file...
+    writeResult(content);
+}
 
-See more examples in [demo](demo) folder.
+function writeResult (content) {
 
-Documentation
--------------
+    const
+        // nodejs core...
+        path  = require('path'),
+        fs  = require('fs-extra')
+    ;
 
-- [Rich Text Format (RTF) Version 1.5 Specification](http://www.biblioscape.com/rtf15_spec.htm)
+    // writing file
+    fs.ensureDirSync(path.dirname(resultFile));
+    fs.writeFile(resultFile, content, function (error) {
+        if ( !error ) {
+            console.info('Created file ' + resultFile);
+        }
+        else {
+            console.error(error);
+        }
+    });
+
+}
 

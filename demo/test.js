@@ -24,46 +24,86 @@ else {
 
 function testRTF (jsRTF) {
 
-    // Create RTF object
-    var myDoc = new jsRTF({
-        // Language: Russian
-        language : jsRTF.Language.RU,
-        // Set page size: A4 horizontal
-        pageWidth : jsRTF.Utils.mm2twips(297),
-        pageHeight : jsRTF.Utils.mm2twips(210),
-        // Landscape page format -- which effect it making?
-        landscape : true,
-    });
+    var
+        // Default page margin size (twips)
+        pageMargin = 3000,
+        // Page options
+        pageOptions = {
+            // Language: Russian
+            language : jsRTF.Language.RU,
+            // Set page size: A4 horizontal
+            pageWidth : jsRTF.Utils.mm2twips(297),
+            pageHeight : jsRTF.Utils.mm2twips(210),
+            // Landscape page format -- which effect it making?
+            landscape : true,
+            // Margins:
+            marginLeft : pageMargin,
+            marginTop : pageMargin,
+            marginBottom : pageMargin,
+            marginRight : pageMargin,
+        },
+        // Calculate content width (for 100% tables, for example)
+        contentWidth = pageOptions.pageWidth - pageOptions.marginLeft - pageOptions.marginRight;
+        // Create RTF object
+        myDoc = new jsRTF(pageOptions)
+    ;
 
     // Formatter object
-    var textFormat = new jsRTF.Format({
-        spaceBefore : 300,
-        spaceAfter : 300,
-        paragraph : true,
-        align : 'center',
-    });
+    var
+        titleStyle = new jsRTF.Format({
+            spaceBefore : 500,
+            spaceAfter : 500,
+            paragraph : true,
+            align : 'center',
+            fontSize : 30,
+            color : jsRTF.Colors.ORANGE,
+        })
+        textStyle = new jsRTF.Format({
+            spaceBefore : 300,
+            spaceAfter : 300,
+            paragraph : true,
+        })
+    ;
 
     // Adding text styled with formatter
-    myDoc.writeText('demo', textFormat);
+    myDoc.writeText('Title', titleStyle);
 
     // Add table
-    var table = new jsRTF.TableElement({
-        format : new jsRTF.Format({ tableBorder : 10 }),
-        cellsFormat : [
-            new jsRTF.Format({ bold : true }),
-            new jsRTF.Format({ color : jsRTF.Colors.RED }),
-        ],
-        firstRowFormat : [
-            new jsRTF.Format({ italic : true }),
-        ],
-    });
+    var cellPadding = 100,
+        cellBaseProps = {
+            spaceBefore : cellPadding,
+            spaceAfter : cellPadding,
+            leftIndent : cellPadding,
+            rightIndent : cellPadding,
+        },
+        table = new jsRTF.TableElement({
+            format : new jsRTF.Format({
+                tableBorder : 10,
+                tableWidth : contentWidth,
+            }),
+            rowFormat : new jsRTF.Format(Object.assign({}, cellBaseProps, {
+                // strike : true,
+                // color : jsRTF.Colors.GRAY,
+            })),
+            firstRowFormat : new jsRTF.Format(Object.assign({}, cellBaseProps, {
+                tableHeader : true,
+                bold : false,
+                color : jsRTF.Colors.WHITE,
+                bgColor : jsRTF.Colors.RED,
+            })),
+            cellsFormats : [
+                new jsRTF.Format({ widthRatio : .2, strike : true, bold : true, color : jsRTF.Colors.GREEN }),
+                new jsRTF.Format({ widthPercents : 80, underline : true, color : jsRTF.Colors.MAROON }),
+            ],
+        })
+    ;
     // Add rows
-    table.addRow(['Table row', 'with two columns']);
-    table.addRow(['Second row', 'and the second column']);
+    table.addRow([ 'Table row', 'with two columns' ]);
+    table.addRow([ 'Second row', 'and the second column' ]);
     myDoc.addTable(table);
 
-    myDoc.writeText('demo2', textFormat);
-    // myDoc.writeText('demo3', textFormat);
+    myDoc.writeText('Demo text.', textStyle);
+    // myDoc.writeText('demo3', textStyle);
     //
     // // add table
     // var table2 = new TableElement();
