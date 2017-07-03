@@ -34,20 +34,31 @@ function testRTF (jsRTF) {
         spaceBefore : 300,
         spaceAfter : 300,
         paragraph : true,
+        align : 'center',
     });
+
     // Adding text styled with formatter
     myDoc.writeText('demo', textFormat);
 
     // Add table
-    var table = new jsRTF.TableElement();
+    var table = new jsRTF.TableElement({
+        format : new jsRTF.Format({ tableBorder : 10 }),
+        cellsFormat : [
+            new jsRTF.Format({ bold : true }),
+            new jsRTF.Format({ color : jsRTF.Colors.RED }),
+        ],
+        firstRowFormat : [
+            new jsRTF.Format({ italic : true }),
+        ],
+    });
     // Add rows
     table.addRow(['Table row', 'with two columns']);
     table.addRow(['Second row', 'and the second column']);
     myDoc.addTable(table);
 
     myDoc.writeText('demo2', textFormat);
-    myDoc.writeText('demo3', textFormat);
-
+    // myDoc.writeText('demo3', textFormat);
+    //
     // // add table
     // var table2 = new TableElement();
     // // You can manually set the data *overwrites any data in the table
@@ -61,8 +72,9 @@ function testRTF (jsRTF) {
     // table2.addRow(['Banana', '$0.12', '1']);
     // myDoc.addTable(table2);
 
-    // make content & write file...
+    // Make content
     var content = myDoc.createDocument();
+    // Write file...
     writeResult(content);
 }
 
