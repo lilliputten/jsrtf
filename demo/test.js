@@ -26,7 +26,13 @@ function testRTF (jsRTF) {
 
     // Create RTF object
     var myDoc = new jsRTF({
+        // Language: Russian
         language : jsRTF.Language.RU,
+        // Set page size: A4 horizontal
+        pageWidth : jsRTF.Utils.mm2twips(297),
+        pageHeight : jsRTF.Utils.mm2twips(210),
+        // Landscape page format -- which effect it making?
+        landscape : true,
     });
 
     // Formatter object

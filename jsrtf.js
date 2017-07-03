@@ -154,14 +154,6 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         this.addCommand('\\sect', groupName, options);
     },/*}}}*/
 
-    // /** addPara ** {{{ Adds paragraph (??? use Format option `paragraph` instead?)
-    //  * @param {Object} [options]
-    //  * @param {String} [groupName]
-    //  */
-    // addPara : function (options, groupName) {
-    //     this.addCommand('\\par', groupName, options);
-    // },/*}}}*/
-
     /** addOptions ** {{{ Adds options (or styles) ???
      * @param {Object} [options]
      * @param {String} [groupName]
@@ -190,14 +182,6 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
 
         var output = '\{\\rtf1\\ansi\\deff0\n';
 
-        /* {{{ OLD CODE
-        if ( this.params.orientation === jsRTF.Orientation.LANDSCAPE ) { output += '\\landscape'; }
-        if ( this.params.marginLeft ) { output += '\\margl' + this.params.marginLeft; }
-        if ( this.params.marginRight ) { output += '\\margr' + this.params.marginRight; }
-        if ( this.params.marginTop ) { output += '\\margt' + this.params.marginTop; }
-        if ( this.params.marginBottom ) { output += '\\margb' + this.params.marginBottom; }
-        if ( this.params.language ) { output += '\\deflang' + this.params.language; }
-        OLD CODE }}} */
         var options = new jsRTF.Options(this.params);
         output += options.compile() + NL;
 
@@ -205,24 +189,13 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         output += jsRTF.Utils.createColorTable(this.colorTable) + NL;
         output += jsRTF.Utils.createFontTable(this.fontTable) + NL;
 
-        /* {{{ OLD CODE
-        //other options
-        if ( this.params.pageNumbering ) {
-            output += '\{\\header\\pard\\qr\\plain\\f0\\chpgn\\par\}' + NL;
-        }
-        if ( this.params.columns ) {
-            output += '\\cols' + this.params.columns + NL;
-        }
-        if ( this.params.columnLines ) {
-            output += '\\linebetcol' + NL;
-        }
-        OLD CODE }}} */
-
         var elemsContent = this.elements
             .map(el => ( el instanceof jsRTF.Element ) ? el.getRTFCode(this.colorTable, this.fontTable) : jsRTF.Utils.getRTFSafeText(el))
             .join('\n')
         ;
+
         output += elemsContent + '\n\}';
+
         return output;
 
     },/*}}}*/

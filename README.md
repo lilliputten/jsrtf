@@ -33,7 +33,13 @@ Creating RTF
 ```javascript
     // Create RTF object
     var myDoc = new jsRTF({
+        // Language: Russian
         language : jsRTF.Language.RU,
+        // Set page size: A4 horizontal
+        pageWidth : jsRTF.Utils.mm2twips(297),
+        pageHeight : jsRTF.Utils.mm2twips(210),
+        // Landscape page format -- which effect it making?
+        landscape : true,
     });
 
     // Formatter object
@@ -51,8 +57,8 @@ Creating RTF
     var table = new jsRTF.TableElement({
         format : new jsRTF.Format({ tableBorder : 10 }),
         cellsFormat : [
-            new jsRTF.Format({ bold : true }),
-            new jsRTF.Format({ color : jsRTF.Colors.RED }),
+            new jsRTF.Format({ bold : true }), // #0
+            new jsRTF.Format({ color : jsRTF.Colors.RED }), // #1
         ],
         firstRowFormat : [
             new jsRTF.Format({ italic : true }),
