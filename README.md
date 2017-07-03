@@ -25,7 +25,6 @@ Using YModules:
 modules.require(['jsrtf'], (jsRTF) => {
     // ...
 });
-], testRTF);
 ```
 
 Creating RTF
