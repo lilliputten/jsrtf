@@ -24,21 +24,23 @@ else {
 
 function testRTF (jsRTF) {
 
-    // create rtf
+    // Create RTF object
     var myDoc = new jsRTF({
         language : jsRTF.Language.RU,
     });
 
+    // Formatter object
     var textFormat = new jsRTF.Format({
         spaceBefore : 300,
         spaceAfter : 300,
         paragraph : true,
     });
+    // Adding text styled with formatter
     myDoc.writeText('demo', textFormat);
 
-    // add table
+    // Add table
     var table = new jsRTF.TableElement();
-    //add rows
+    // Add rows
     table.addRow(['Table row', 'with two columns']);
     table.addRow(['Second row', 'and the second column']);
     myDoc.addTable(table);
