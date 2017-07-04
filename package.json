@@ -1,6 +1,6 @@
 {
   "name": "jsrtf",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Assists with creating rich text documents.",
   "main": "rtf.js",
   "author": "lilliputten <igor@lilliputten.ru>",
