@@ -15,22 +15,6 @@ var
     NL = '\n'
 ;
 
-// {{{ resolveModules sample code
-// var resolveModules = require('./lib/resolve-modules');
-// resolveModules([
-//     'inherit',
-// ],
-// function __jsRTFResolveSuccess (
-//     inherit,
-// __BASE) {
-// }, /* {{{ Error... */function __jsRTFResolveError (err) {
-//     // console.error('jsRTF error:', err);
-//     // /*DEBUG*//*jshint -W087*/debugger;
-//     throw new Error(err);
-// }/*}}}*/
-// ); // end resolveModules
-// resolveModules sample code }}}
-
 /**
  * @class
  * @name jsRTF
@@ -178,7 +162,7 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
     },/*}}}*/
 
     /** createDocument ** {{{ */
-    createDocument : function (/* callback */) {
+    createDocument : function () {
 
         var output = '\{\\rtf1\\ansi\\deff0\n';
 
