@@ -88,12 +88,159 @@ module.exports = __webpack_require__(11);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /**
+ * @module format
+ * @overview Formating
+ * @author lilliputten <igor@lilliputten.ru>
+ */
+
+var RGB = __webpack_require__(4),
+    Fonts = __webpack_require__(5),
+    Colors = __webpack_require__(6),
+    Utils = __webpack_require__(3),
+    Options = __webpack_require__(7),
+    inherit = __webpack_require__(0);
+
+/** wrap ** {{{ some RTF elements require that they are wrapped, closed by a trailing 0 and must have a spacebefore the text
+ */
+function wrap(text, prefix, postfix) {
+    postfix = postfix || prefix + '0';
+    return prefix + ' ' + text + postfix;
+} /*}}}*/
+
+/**
+ * @class
+ * @name Format
+ */
+var Format = inherit( /** @lends Format.prototype */{
+
+    /** __constructor ** {{{
+     * @param {Object} [options]
+     */
+    __constructor: function __constructor(options) {
+        Object.assign(this, Format.defaultOptions, options);
+    }, /*}}}*/
+
+    /** updateTables ** {{{ */
+    updateTables: function updateTables(colorTable, fontTable) {
+
+        // font...
+        this.fontPos = fontTable.indexOf(this.font);
+        // if a font was defined, and it's not in a table, add it in!
+        if (this.fontPos < 0 && this.font !== undefined && this.font) {
+            this.fontPos = fontTable.length;
+            fontTable.push(this.font);
+        }
+
+        // colors...
+        [{ obj: this, key: 'color' }, { obj: this, key: 'bgColor' }, { obj: this, key: 'borderColor' }, { obj: this.borderLeft, key: 'color' }, { obj: this.borderRight, key: 'color' }, { obj: this.borderTop, key: 'color' }, { obj: this.borderBottom, key: 'color' }].map(function (item) {
+            var obj = item.obj,
+                key = item.key;
+            if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' && obj[key]) {
+                var keyPos = key + 'Pos';
+                obj[keyPos] = Utils.getColorPosition(colorTable, obj[key]);
+                if (obj[keyPos] < 0 && obj[key]) {
+                    obj[keyPos] = colorTable.length;
+                    colorTable.push(obj[key]);
+                }
+            }
+        });
+    }, /*}}}*/
+
+    /** formatText ** {{{ Applies a format to some text
+     * @param {String} text
+     * @param {Object} colorTable
+     * @param {Object} fontTable
+     * @param {Boolean} [safeText]
+     */
+    formatText: function formatText(text, colorTable, fontTable, safeText) {
+
+        safeText === undefined && (safeText = true);
+
+        this.updateTables(colorTable, fontTable);
+
+        var options = new Options(this);
+        var optionsStr = options.compile();
+
+        // we don't escape text if there are other elements in it, so set a flag
+        if (safeText && typeof text === 'string') {
+            text = Utils.getRTFSafeText(text);
+        }
+
+        var content = [optionsStr, text].join(' ');
+
+        content = options.applyWrappers(content);
+
+        return ['\{', content, '\}'].join('');
+    } /*}}}*/
+
+}, /*{{{ Static properties... */ /** @lends Format */{
+
+    /** defaultOptions ** {{{
+     * @type {Object}
+     */
+    defaultOptions: {
+
+        // font: Fonts.ARIAL,
+
+    } /*}}}*/
+
+    /*}}}*/
+}); // end inherit
+
+module.exports = Format;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @module element
+ * @overview Base element class
+ * @author lilliputten <igor@lilliputten.ru>
+ */
+var Format = __webpack_require__(1),
+    inherit = __webpack_require__(0);
+
+// Function.prototype.subclass = function(base) {
+//     var c = Function.prototype.subclass.nonconstructor;
+//     c.prototype= base.prototype;
+//     this.prototype= new c ();
+// };
+// Function.prototype.subclass.nonconstructor = function() {};
+
+var Element = inherit({
+
+    /** __constructor ** {{{ */
+    __constructor: function __constructor(format) {
+        if (format === undefined) {
+            format = new Format();
+        }
+        this.format = format;
+    } /*}}}*/
+
+});
+
+module.exports = Element;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
  * @module rtf-utils
  * @overview Misc utilities & helpers.
  * @author lilliputten <igor@lilliputten.ru>
  */
-var RGB = __webpack_require__(2),
-    Fonts = __webpack_require__(4),
+var RGB = __webpack_require__(4),
+    Fonts = __webpack_require__(5),
     inherit = __webpack_require__(0);
 
 /** String.prototype.replaceAll ** {{{ Replaces all occurrences of a substring in a string
@@ -142,8 +289,11 @@ module.exports = {
      */
     getRTFSafeText: function getRTFSafeText(text) {
         //if text is overridden not to be safe
-        if ((typeof text === 'undefined' ? 'undefined' : _typeof(text)) === 'object' && text.hasOwnProperty('safe') && !text.safe) {
+        if ((typeof text === 'undefined' ? 'undefined' : _typeof(text)) === 'object' && text.hasOwnProperty('text') && text.hasOwnProperty('safe') && !text.safe) {
             return text.text;
+        } else if ((typeof text === 'undefined' ? 'undefined' : _typeof(text)) === 'object') {
+            // console.log(' getRTFSafeText object', text );
+            throw new Error('Expecting text, not object');
         }
         //this could probably all be replaced by a bit of regex
         return text.replaceAll('\\', '\\\\').replaceAll('\{', '\\\{').replaceAll('\}', '\\\}').replaceAll('~', '\\~').replaceAll('-', '\\-').replaceAll('_', '\\_')
@@ -199,7 +349,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -212,43 +362,7 @@ module.exports = function (red, green, blue) {
 };
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * @module element
- * @overview Base element class
- * @author lilliputten <igor@lilliputten.ru>
- */
-var Format = __webpack_require__(5),
-    inherit = __webpack_require__(0);
-
-// Function.prototype.subclass = function(base) {
-//     var c = Function.prototype.subclass.nonconstructor;
-//     c.prototype= base.prototype;
-//     this.prototype= new c ();
-// };
-// Function.prototype.subclass.nonconstructor = function() {};
-
-var Element = inherit({
-
-    /** __constructor ** {{{ */
-    __constructor: function __constructor(format) {
-        if (format === undefined) {
-            format = new Format();
-        }
-        this.format = format;
-    } /*}}}*/
-
-});
-
-module.exports = Element;
-
-/***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -268,141 +382,13 @@ module.exports = {
 };
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * @module format
- * @overview Formating
- * @author lilliputten <igor@lilliputten.ru>
- */
-
-var RGB = __webpack_require__(2),
-    Fonts = __webpack_require__(4),
-    Colors = __webpack_require__(6),
-    Utils = __webpack_require__(1),
-    Options = __webpack_require__(7),
-    inherit = __webpack_require__(0);
-
-/** wrap ** {{{ some RTF elements require that they are wrapped, closed by a trailing 0 and must have a spacebefore the text
- */
-function wrap(text, prefix, postfix) {
-    postfix = postfix || prefix + '0';
-    return prefix + ' ' + text + postfix;
-} /*}}}*/
-
-/**
- * @class
- * @name Format
- */
-var Format = inherit( /** @lends Format.prototype */{
-
-    /** __constructor ** {{{
-     * @param {Object} [options]
-     */
-    __constructor: function __constructor(options) {
-        Object.assign(this, Format.defaultOptions, options);
-    }, /*}}}*/
-
-    /** updateTables ** {{{ */
-    updateTables: function updateTables(colorTable, fontTable) {
-        this.fontPos = fontTable.indexOf(this.font);
-        this.colorPos = Utils.getColorPosition(colorTable, this.color);
-        this.bgColorPos = Utils.getColorPosition(colorTable, this.bgColor);
-
-        // if a font was defined, and it's not in a table, add it in!
-        if (this.fontPos < 0 && this.font !== undefined && this.font) {
-            this.fontPos = fontTable.length;
-            fontTable.push(this.font);
-        }
-        //if a color was defined, and it's not in the table, add it as well
-        if (this.colorPos < 0 && this.color !== undefined) {
-            this.colorPos = colorTable.length;
-            colorTable.push(this.color);
-        }
-        //background colors use the same table as color
-        if (this.bgColorPos < 0 && this.bgColor !== undefined) {
-            this.bgColorPos = colorTable.length;
-            colorTable.push(this.bgColor);
-        }
-    }, /*}}}*/
-
-    /** formatText ** {{{ Applies a format to some text
-     * @param {String} text
-     * @param {Object} colorTable
-     * @param {Object} fontTable
-     * @param {Boolean} [safeText]
-     */
-    formatText: function formatText(text, colorTable, fontTable, safeText) {
-
-        safeText === undefined && (safeText = true);
-
-        this.updateTables(colorTable, fontTable);
-
-        var options = new Options(this);
-        var optionsStr = options.compile();
-
-        // we don't escape text if there are other elements in it, so set a flag
-        if (safeText) {
-            text = Utils.getRTFSafeText(text);
-        }
-
-        var content = [optionsStr, text].join(' ');
-
-        content = options.applyWrappers(content);
-
-        return ['\{', content, '\}'].join('');
-    } /*}}}*/
-
-}, /*{{{ Static properties... */ /** @lends Format */{
-
-    /** defaultOptions ** {{{
-     * @type {Object}
-     */
-    defaultOptions: {
-
-        // underline: false,
-        // bold: false,
-        // italic: false,
-        // strike: false,
-        //
-        // superScript: false,
-        // subScript: false,
-        //
-        // paragraph: false,
-        //
-        // align: '',
-        //
-        // leftIndent: 0,
-        // rightIndent: 0,
-        //
-        font: Fonts.ARIAL
-        // fontSize: 0,
-        // //color: rgb,
-        // //bgColor: rgb,
-        //
-        // colorPos: -1,
-        // bgColorPos: -1,
-        // fontPos: -1,
-
-    } /*}}}*/
-
-    /*}}}*/
-}); // end inherit
-
-module.exports = Format;
-
-/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var RGB = __webpack_require__(2);
+var RGB = __webpack_require__(4);
 module.exports = {
     BLACK: new RGB(0, 0, 0),
     WHITE: new RGB(255, 255, 255),
@@ -498,6 +484,8 @@ var Options = inherit({
             var value = _this[ctx.key] === true ? '' : _this[ctx.key];
             if (typeof ctx.value === 'function') {
                 value = ctx.value.call(_this, _this[ctx.key]);
+            } else if (_typeof(ctx.value) === 'object' && ctx.value[_this[ctx.key]]) {
+                value = ctx.value[_this[ctx.key]];
             }
             return [ctx.prefix, ctx.name, value, ctx.postfix].join('');
         }, this).join('');
@@ -556,23 +544,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var inherit = __webpack_require__(0),
     lib = __webpack_require__(12),
+    isArray = Array.isArray,
     NL = '\n';
-
-// {{{ resolveModules sample code
-// var resolveModules = require('./lib/resolve-modules');
-// resolveModules([
-//     'inherit',
-// ],
-// function __jsRTFResolveSuccess (
-//     inherit,
-// __BASE) {
-// }, /* {{{ Error... */function __jsRTFResolveError (err) {
-//     // console.error('jsRTF error:', err);
-//     // /*DEBUG*//*jshint -W087*/debugger;
-//     throw new Error(err);
-// }/*}}}*/
-// ); // end resolveModules
-// resolveModules sample code }}}
 
 /**
  * @class
@@ -625,14 +598,12 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
         };
     }, /*}}}*/
 
-    /** writeText ** {{{ */
-    writeText: function writeText(text, format, groupName) {
-        var element = new jsRTF.TextElement(text, format);
-        if (groupName !== undefined && this._groupIndex(groupName) >= 0) {
-            this.elements[this._groupIndex(groupName)].push(element);
-        } else {
-            this.elements.push(element);
-        }
+    /** addPara ** {{{ Add paragraph break command (???)
+     * @param {Object} [options]
+     * @param {String} [groupName]
+     */
+    addPara: function addPara(options, groupName) {
+        this.addCommand('\n\\par', groupName, options);
     }, /*}}}*/
 
     /** addTable ** {{{
@@ -651,42 +622,89 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
         }
     }, /*}}}*/
 
-    /** addCommand ** {{{ adds a single command to a given group or as an element
-     * @param {String} command
+    /** addElement ** {{{ adds a single element to a given group or as an element
+     * @param {Object|Array} element
      * @param {String} [groupName]
      * @param {Object} [options]
-     * TODO this should not be in prototype
+     * TODO this should not be in prototype (NOTE: from maintainer?)
      */
-    addCommand: function addCommand(command, groupName, options) {
-        // Options...
+    addElement: function addElement(element, groupName, options) {
+
+        // Check for `(command, options)` passed...
         if (options === undefined && (typeof groupName === 'undefined' ? 'undefined' : _typeof(groupName)) === 'object') {
             options = groupName;
             groupName = undefined;
         }
-        if (options && (typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
-            command += new jsRTF.Options(options).compile();
+
+        if (!element) {
+            throw new Error('Element not defined');
+        } else if (isArray(element)) {
+            element = new lib.ContainerElement(element, options);
+        } else if (typeof element === 'string' || typeof element === 'number') {
+            element = new lib.TextElement(element, options);
         }
+
         // Original code...
         if (groupName !== undefined && this._groupIndex(groupName) >= 0) {
-            this.elements[this._groupIndex(groupName)].addElement({ text: command, safe: false });
+            this.elements[this._groupIndex(groupName)].addElement(element);
         } else {
-            this.elements.push({ text: command, safe: false });
+            this.elements.push(element);
         }
+    }, /*}}}*/
+
+    /** writeText ** {{{ */
+    writeText: function writeText(text, format, groupName) {
+        var element = new jsRTF.TextElement(text, format);
+        this.addElement(element, groupName);
+    }, /*}}}*/
+
+    /** addCommand ** {{{ adds a single command to a given group or as an element
+     * @param {String} command
+     * @param {String} [groupName]
+     * @param {Object} [options]
+     * TODO this should not be in prototype (NOTE: from maintainer?)
+     */
+    addCommand: function addCommand(command, groupName, options) {
+
+        if (!command) {
+            throw new Error('Command not defined');
+        }
+
+        // Check for `(command, options)` passed...
+        if (options === undefined && (typeof groupName === 'undefined' ? 'undefined' : _typeof(groupName)) === 'object') {
+            options = groupName;
+            groupName = undefined;
+        }
+
+        // If options, then adding them to command
+        if (options && (typeof options === 'undefined' ? 'undefined' : _typeof(options)) === 'object') {
+            if (options instanceof lib.Format) {
+                options.updateTables(this.colorTable, this.fontTable);
+            }
+            command += new jsRTF.Options(options).compile();
+        }
+
+        var element = {
+            text: command,
+            safe: false
+        };
+
+        return this.addElement(element);
     }, /*}}}*/
 
     /** addPage ** {{{ page break shortcut */
     addPage: function addPage(groupName) {
-        this.addCommand("\\page", groupName);
+        this.addCommand('\\page', groupName);
     }, /*}}}*/
 
     /** addLine ** {{{ line break shortcut */
     addLine: function addLine(groupName) {
-        this.addCommand("\\line", groupName);
+        this.addCommand('\\line', groupName);
     }, /*}}}*/
 
     /** addTab ** {{{ tab shortcut */
     addTab: function addTab(groupName) {
-        this.addCommand("\\tab", groupName);
+        this.addCommand('\\tab', groupName);
     }, /*}}}*/
 
     /** addSection ** {{{ Adds section
@@ -698,10 +716,16 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
     }, /*}}}*/
 
     /** addOptions ** {{{ Adds options (or styles) ???
-     * @param {Object} [options]
+     * @param {Object} options
      * @param {String} [groupName]
      */
     addOptions: function addOptions(options, groupName) {
+        if (!options) {
+            throw new Error('Options not defined');
+        }
+        if (options && options instanceof lib.Format) {
+            options.updateTables(this.colorTable, this.fontTable);
+        }
         var command = new jsRTF.Options(options).compile();
         if (command) {
             this.addCommand(command, groupName);
@@ -720,23 +744,40 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
         return -1;
     }, /*}}}*/
 
-    /** createDocument ** {{{ */
-    createDocument: function createDocument() /* callback */{
-        var _this = this;
+    /** getRTFCode ** {{{ */
+    getRTFCode: function getRTFCode(item) {
 
+        var result = '';
+
+        if (isArray(item)) {
+            result = item.map(this.getRTFCode, this).join('\n');
+        } else if (item instanceof jsRTF.Element) {
+            result = item.getRTFCode(this.colorTable, this.fontTable);
+        } else {
+            result = jsRTF.Utils.getRTFSafeText(item);
+        }
+
+        return result;
+    }, /*}}}*/
+
+    /** createDocument ** {{{ */
+    createDocument: function createDocument() {
+
+        // Opening document sequence
         var output = '\{\\rtf1\\ansi\\deff0\n';
 
+        // Document parameters
         var options = new jsRTF.Options(this.params);
         output += options.compile() + NL;
 
-        var elemsContent = this.elements.map(function (el) {
-            return el instanceof jsRTF.Element ? el.getRTFCode(_this.colorTable, _this.fontTable) : jsRTF.Utils.getRTFSafeText(el);
-        }).join('\n');
+        // Creating content
+        var elemsContent = this.getRTFCode(this.elements);
 
         //now that the tasks are done running: create tables, data populated during element output
         output += jsRTF.Utils.createColorTable(this.colorTable) + NL;
         output += jsRTF.Utils.createFontTable(this.fontTable) + NL;
 
+        // Finishing document
         output += elemsContent + '\n\}';
 
         return output;
@@ -1046,21 +1087,22 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  */
 module.exports = {
 
-    Utils: __webpack_require__(1),
+    Utils: __webpack_require__(3),
 
-    Fonts: __webpack_require__(4),
+    Fonts: __webpack_require__(5),
     Colors: __webpack_require__(6),
-    RGB: __webpack_require__(2),
+    RGB: __webpack_require__(4),
     Language: __webpack_require__(13),
 
-    Format: __webpack_require__(5),
+    Format: __webpack_require__(1),
 
-    Element: __webpack_require__(3),
+    Element: __webpack_require__(2),
 
-    TableElement: __webpack_require__(15),
+    ContainerElement: __webpack_require__(15),
     TextElement: __webpack_require__(16),
+    TableElement: __webpack_require__(17),
+    GroupElement: __webpack_require__(18),
     // ImageElement : require('./elements/image'),
-    GroupElement: __webpack_require__(17),
 
     Options: __webpack_require__(7)
 
@@ -1088,14 +1130,87 @@ module.exports = {
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @module options-data
  * @overview Definitions of rtf options
  * @author lilliputten <igor@lilliputten.ru>
  */
+
+var
+/** borderTypes ** {{{
+ * @type {Object}
+ */
+borderTypes = {
+    single: 's',
+    doubleThickness: 'th',
+    shadowed: 'sh',
+    double: 'db',
+    dotted: 'dot',
+    dashed: 'dash',
+    hairline: 'hair',
+    dashSmall: 'dashsm',
+    dotDash: 'dashd',
+    dotDotDash: 'dashdd',
+    triple: 'triple',
+    thickThinSmall: 'tnthsg',
+    thinThickSmall: 'thtnsg',
+    thinThickThinSmall: 'tnthtnsg',
+    thickThinMedium: 'tnthmg',
+    thinThickMedium: 'thtnmg',
+    thinThickThinMedium: 'tnthtnmg',
+    thickThinLarge: 'tnthlg',
+    thinThickLarge: 'thtnlg',
+    thinThickThinLarge: 'tnthtnlg',
+    wavy: 'wavy',
+    doubleWavy: 'wavydb',
+    striped: 'dashdotstr',
+    emboss: 'emboss',
+    engrave: 'engrave'
+},
+    /*}}}*/
+/** makeBorder ** {{{ Create border
+ * @type {Function}
+ * @param {Object} baseObject - Parent Format or Options object
+ * @param {String} id - Border property id (eg 'borderLeft')
+ * @param {Object} data - Border descriptions hash
+ * @returns {String}
+ */
+makeBorder = function makeBorder(baseObject, id, data) {
+    var options = {
+        spacing: 'brsp', // border spacing
+        width: 'brdrw', // border spacing
+        // border type
+        type: { name: 'brdr', value: borderTypes },
+        // color
+        color: { name: 'brdrcf', value: function value(v) {
+                return baseObject[id].colorPos + 1;
+            } }
+    },
+        result = Object.keys(data).filter(function (key) {
+        return data[key] !== undefined && options[key] !== undefined;
+    }).map(function (key) {
+        var value = data[key];
+        var result = options[key];
+        if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) === 'object' && result.name) {
+            if (_typeof(result.value) === 'object' && result.value[value] !== undefined) {
+                value = result.value[value];
+                result = result.name;
+            } else if (typeof result.value === 'function') {
+                value = result.value.call(baseObject, value);
+                result = result.name;
+            }
+        }
+        return '\\' + result + value;
+    }).join('');
+    return result;
+} /*}}}*/
+;
+
 module.exports = {
 
-    /** List of all entities */
+    /** options ** {{{ List of all entities */
     options: {
 
         spaceBefore: 'sb',
@@ -1130,6 +1245,31 @@ module.exports = {
             }, value: function value(v) {
                 return this.bgColorPos + 1;
             } }, // NOTE: using non-arrow function for catch `this` value
+        borderColor: { name: 'brdrcf', test: function test(v) {
+                return v;
+            }, value: function value(v) {
+                return this.borderColorPos + 1;
+            } }, // NOTE: using non-arrow function for catch `this` value
+
+        // custom borders
+        borderLeft: { name: 'brdrl', value: function value(v) {
+                return makeBorder(this, 'borderLeft', v);
+            } },
+        borderRight: { name: 'brdrr', value: function value(v) {
+                return makeBorder(this, 'borderRight', v);
+            } },
+        borderTop: { name: 'brdrt', value: function value(v) {
+                return makeBorder(this, 'borderTop', v);
+            } },
+        borderBottom: { name: 'brdrb', value: function value(v) {
+                return makeBorder(this, 'borderBottom', v);
+            } },
+
+        // common border properties (may be overriden by borderLeft etc)
+        borderSpacing: 'brsp', // border spacing
+        borderWidth: 'brdrw', // border spacing
+        // border type
+        borderType: { name: 'brdr', value: borderTypes },
 
         // tableHeader : 'trhdr',
 
@@ -1161,17 +1301,129 @@ module.exports = {
         strike: { wrap: true, prefix: '\\strike', postfix: '\\strike0' },
         subScript: { wrap: true, prefix: '\\sub', postfix: '\\sub0' },
         superScript: { wrap: true, prefix: '\\super', postfix: '\\super0' }
-    },
+    }, /*}}}*/
 
-    /** Entities sort order: first items */
-    optionsFirst: ['paragraph'],
-    /** Entities sort order: last items */
-    oprionsLast: ['bold', 'italic', 'underline', 'strike', 'subScript', 'superScript']
+    /** optionsFirst ** {{{ Entities sort order: first items */
+    optionsFirst: ['paragraph'], /*}}}*/
+    /** oprionsLast ** {{{ Entities sort order: last items */
+    oprionsLast: ['bold', 'italic', 'underline', 'strike', 'subScript', 'superScript'] /*}}}*/
 
 };
 
 /***/ }),
 /* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
+ * @module container
+ * @overview Container element class
+ * @author lilliputten <igor@lilliputten.ru>
+ */
+var Element = __webpack_require__(2),
+    Format = __webpack_require__(1),
+    inherit = __webpack_require__(0),
+    isArray = Array.isArray;
+
+var ContainerElement = inherit(Element, {
+
+    /** __constructor ** {{{ */
+    __constructor: function __constructor(data, format) {
+        // Element.apply(this, [format]);
+        this.__base.call(this, format);
+        if (this.format && _typeof(this.format) === 'object' && !(this.format instanceof Format)) {
+            this.format = new Format(this.format);
+        }
+        this.data = data;
+    }, /*}}}*/
+
+    /** getItemRTFCode ** {{{ Get single object rtf code
+     * @param {*} item
+     * @param {Object} colorTable
+     * @param {Object} fontTable
+     * @returns {String}
+     */
+    getItemRTFCode: function getItemRTFCode(item, colorTable, fontTable) {
+        var _this = this;
+
+        var result = '';
+
+        if (isArray(item)) {
+            result = item.map(function (item) {
+                return _this.getItemRTFCode(item, colorTable, fontTable);
+            }).join('\n');
+        } else if (item instanceof Element) {
+            result = item.getRTFCode(colorTable, fontTable);
+        } else {
+            result = this.format.formatText(item, colorTable, fontTable);
+        }
+
+        return result;
+    }, /*}}}*/
+
+    /** getRTFCode ** {{{ Get element rtf code
+     * @param {Object} colorTable
+     * @param {Object} fontTable
+     * @returns {String}
+     */
+    getRTFCode: function getRTFCode(colorTable, fontTable) {
+
+        var data = this.getItemRTFCode(this.data, colorTable, fontTable);
+
+        data = this.format.formatText(data, colorTable, fontTable, false);
+
+        return data;
+    } /*}}}*/
+
+});
+
+module.exports = ContainerElement;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
+ * @module text
+ * @overview Text element class
+ * @author lilliputten <igor@lilliputten.ru>
+ */
+var Element = __webpack_require__(2),
+    Format = __webpack_require__(1),
+    inherit = __webpack_require__(0);
+
+var TextElement = inherit(Element, {
+
+    /** __constructor ** {{{ */
+    __constructor: function __constructor(text, format) {
+        // Element.apply(this, [format]);
+        this.__base.call(this, format);
+        if (this.format && _typeof(this.format) === 'object' && !(this.format instanceof Format)) {
+            this.format = new Format(this.format);
+        }
+        this.text = text;
+    }, /*}}}*/
+
+    /** getRTFCode ** {{{ */
+    getRTFCode: function getRTFCode(colorTable, fontTable) {
+        return this.format.formatText(this.text, colorTable, fontTable);
+    } /*}}}*/
+
+});
+
+module.exports = TextElement;
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1183,9 +1435,9 @@ module.exports = {
  * @author lilliputten <igor@lilliputten.ru>
  */
 
-var Utils = __webpack_require__(1),
-    Format = __webpack_require__(5),
-    Element = __webpack_require__(3),
+var Utils = __webpack_require__(3),
+    Format = __webpack_require__(1),
+    Element = __webpack_require__(2),
     inherit = __webpack_require__(0),
     isArray = Array.isArray;
 
@@ -1260,7 +1512,9 @@ var TableElement = inherit(Element, {
                 rowPlus += '\\trhdr';
             }
             if (tableFormat.tableBorder) {
-                rowPlus += ['', '\\clbrdrt\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrb\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrl\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrr\\brdrs\\brdrw' + tableFormat.tableBorder].join('\n');
+                rowPlus += ['',
+                // TODO: border type, color?
+                '\\clbrdrt\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrb\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrl\\brdrs\\brdrw' + tableFormat.tableBorder, '\\clbrdrr\\brdrs\\brdrw' + tableFormat.tableBorder].join('\n');
             }
             var cellFormat = _this.cellsFormats[n];
             var bgColorPos = cellFormat && Utils.isIndex(cellFormat.bgColorPos) ? cellFormat.bgColorPos : rowFormat.bgColorPos;
@@ -1329,43 +1583,7 @@ var TableElement = inherit(Element, {
 module.exports = TableElement;
 
 /***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * @module text
- * @overview Text element class
- * @author lilliputten <igor@lilliputten.ru>
- */
-var Element = __webpack_require__(3),
-    inherit = __webpack_require__(0);
-
-var TextElement = inherit(Element, {
-
-    /** __constructor ** {{{ */
-    __constructor: function __constructor(text, format) {
-        // Element.apply(this, [format]);
-        this.__base.call(this, format);
-        this.text = text;
-    }, /*}}}*/
-
-    /** getRTFCode ** {{{ */
-    getRTFCode: function getRTFCode(colorTable, fontTable /* , callback */) {
-        // // {{{ OLD ASYNC CODE
-        // return callback ? callback(null, this.format.formatText(this.text, colorTable, fontTable)) : this.format.formatText(this.text, colorTable, fontTable);
-        // // OLD ASYNC CODE }}}
-        return this.format.formatText(this.text, colorTable, fontTable);
-    } /*}}}*/
-
-});
-
-module.exports = TextElement;
-
-/***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1377,10 +1595,10 @@ module.exports = TextElement;
  * @author lilliputten <igor@lilliputten.ru>
  */
 
-var Utils = __webpack_require__(1),
+var Utils = __webpack_require__(3),
 
 // async = require('async'),
-Element = __webpack_require__(3),
+Element = __webpack_require__(2),
     inherit = __webpack_require__(0);
 
 var GroupElement = inherit(Element, {
@@ -1399,29 +1617,6 @@ var GroupElement = inherit(Element, {
 
     /** getRTFCode ** {{{ */
     getRTFCode: function getRTFCode(colorTable, fontTable /* , callback */) {
-        // // {{{ OLD ASYNC CODE
-        // if ( callback ) {
-        //     var tasks = [];
-        //     var rtf = '';
-        //     this.elements.forEach(function(el) {
-        //         if ( el instanceof Element ) {
-        //             tasks.push(function(cb) { el.getRTFCode(colorTable, fontTable, cb); });
-        //         } else {
-        //             tasks.push(function(cb) { cb(null, Utils.getRTFSafeText(el)); });
-        //         }
-        //     });
-        //     return async.parallel(tasks, function(err, results) {
-        //         results.forEach(function(result) {
-        //             rtf += result;
-        //         });
-        //         //formats the whole group
-        //         rtf = this.format.formatText(rtf, colorTable, fontTable, false);
-        //         return callback(null, rtf);
-        //     });
-        // }
-        // else {
-        // }
-        // // OLD ASYNC CODE }}}
         var content = this.elements.map(function (el) {
             return el instanceof Element ? el.getRTFCode(colorTable, fontTable) : Utils.getRTFSafeText(el);
         }).join('\n');

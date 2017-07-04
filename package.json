@@ -40,6 +40,6 @@
     "unit": "mocha test/",
     "test": "npm run lint && npm run unit",
     "make": "webpack --display-modules",
-    "demo": "node demo/test.js && start demo/.results/demo.rtf"
+    "demo": "node demo/complex-demo.js && start demo/.results/complex-demo.rtf"
   }
 }

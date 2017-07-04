@@ -1,6 +1,5 @@
 
-
-const resultFile = __dirname + '/.results/simple-test.rtf';
+const resultFile = __dirname + '/.results/simple-demo.rtf';
 
 // YM (DEBUG)
 const modules = global.modules = require('ym');

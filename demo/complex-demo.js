@@ -1,6 +1,5 @@
 
-
-const resultFile = __dirname + '/.results/demo.rtf';
+const resultFile = __dirname + '/.results/complex-demo.rtf';
 
 // YM (DEBUG)
 const modules = global.modules = require('ym');
@@ -62,6 +61,9 @@ function testRTF (jsRTF) {
             align : 'center',
             fontSize : 30,
             color : jsRTF.Colors.ORANGE,
+            borderBottom : { type : 'single', width : 10, spacing : 100 },
+            borderColor : jsRTF.Colors.RED,
+            borderTop : { type : 'double', width : 50, spacing : 100, color : jsRTF.Colors.GREEN },
         }),
         emphasisStyle = new jsRTF.Format({
             color : jsRTF.Colors.darkGreen, // Custom color added above

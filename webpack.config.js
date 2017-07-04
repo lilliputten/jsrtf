@@ -24,12 +24,10 @@ module.exports = {
   loaders: [
     {
       loader: 'babel-loader',
-
       // Skip any files outside of your project's `src` directory
       include: [
         __dirname,
       ],
-
       // Options to configure babel with
       query: {
         // plugins: ['transform-runtime'],
