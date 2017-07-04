@@ -7,8 +7,6 @@ jsRTF
 
 An RTF document creation library for javascript.
 
-[Github](https://github.com/lilliputten/jsrtf)
-
 Based on Jonathan Rowny's [node-rtf](https://github.com/jrowny/node-rtf).
 
 Features

@@ -1,6 +1,6 @@
 {
   "name": "jsrtf",
-  "version": "0.0.2",
+  "version": "0.0.2b",
   "description": "Assists with creating rich text documents.",
   "main": "rtf.js",
   "author": "lilliputten <igor@lilliputten.ru>",
@@ -32,7 +32,6 @@
     "sinon-chai": "^2.11.0",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0",
     "ym": "^0.1.2"
   },
   "scripts": {
