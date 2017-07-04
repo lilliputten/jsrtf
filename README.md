@@ -19,8 +19,7 @@ Features
 Installation
 ------------
 
-`
-``shell
+```shell
 npm install --save jsrtf
 ```
 
