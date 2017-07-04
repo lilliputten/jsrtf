@@ -1,4 +1,4 @@
-jsrtf
+jsRTF
 =====
 
 An RTF document creation library for javascript.
