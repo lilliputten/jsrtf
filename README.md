@@ -113,10 +113,10 @@ Examples
     myDoc.addElement([
         new jsRTF.ContainerElement([
             new jsRTF.TextElement('Striked ', emphasisStyle),
-            'content',
+            'content and',
         ], { strike : true }),
-        new jsRTF.TextElement(' textStyle ', emphasisStyle),
-        new jsRTF.TextElement(JSON.stringify(textStyle)),
+        new jsRTF.TextElement(' display `textStyle` variable: ', emphasisStyle),
+        new jsRTF.TextElement(JSON.stringify(textStyle)), // TODO: Code coloring plugin?
     ], {
         paragraph : true,
         spaceBefore : 500,
@@ -157,20 +157,6 @@ Examples
     myDoc.addTable(table);
 
     myDoc.writeText('Demo text.', textStyle);
-    // myDoc.writeText('demo3', textStyle);
-    //
-    // // add table
-    // var table2 = new TableElement();
-    // // You can manually set the data *overwrites any data in the table
-    // table2.setData([
-    //     ['Name', 'Price', 'Sold'],
-    //     ['Rubber Ducky', '$10.00', '22'],
-    //     ['Widget', '$99.99', '42'],
-    //     ['Sproket', '$5.24', '11']
-    // ]);
-    // //adding a row to an existing data set
-    // table2.addRow(['Banana', '$0.12', '1']);
-    // myDoc.addTable(table2);
 
     // Make content
     var content = myDoc.createDocument();

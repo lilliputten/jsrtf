@@ -62,7 +62,7 @@ function testRTF (jsRTF) {
             align : 'center',
             fontSize : 30,
             color : jsRTF.Colors.ORANGE,
-        })
+        }),
         emphasisStyle = new jsRTF.Format({
             color : jsRTF.Colors.darkGreen, // Custom color added above
         }),
@@ -80,10 +80,10 @@ function testRTF (jsRTF) {
     myDoc.addElement([
         new jsRTF.ContainerElement([
             new jsRTF.TextElement('Striked ', emphasisStyle),
-            'content',
+            'content and',
         ], { strike : true }),
-        new jsRTF.TextElement(' textStyle ', emphasisStyle),
-        new jsRTF.TextElement(JSON.stringify(textStyle)),
+        new jsRTF.TextElement(' display `textStyle` variable: ', emphasisStyle),
+        new jsRTF.TextElement(JSON.stringify(textStyle)), // TODO: Code coloring plugin?
     ], {
         paragraph : true,
         spaceBefore : 500,
