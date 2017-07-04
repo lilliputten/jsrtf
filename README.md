@@ -1,6 +1,6 @@
-[![GitHub Release](https://img.shields.io/github/release/lilliputten/templates-parser.svg)](https://github.com/lilliputten/templates-parser/releases)
-[![Build Status](https://api.travis-ci.org/lilliputten/templates-parser.svg?branch=master)](https://travis-ci.org/lilliputten/templates-parser)
-[![npm version](https://badge.fury.io/js/templates-parser.svg)](https://badge.fury.io/js/templates-parser)
+[![GitHub Release](https://img.shields.io/github/release/lilliputten/jsrtf.svg)](https://github.com/lilliputten/jsrtf/releases)
+[![Build Status](https://api.travis-ci.org/lilliputten/jsrtf.svg?branch=master)](https://travis-ci.org/lilliputten/jsrtf)
+[![npm version](https://badge.fury.io/js/jsrtf.svg)](https://badge.fury.io/js/jsrtf)
 
 jsRTF
 =====
@@ -19,7 +19,8 @@ Features
 Installation
 ------------
 
-```shell
+`
+``shell
 npm install --save jsrtf
 ```
 
