@@ -1,5 +1,5 @@
 var
-    webpack = require('webpack')
+    webpack = require('webpack'),
     path = require('path')
 ;
 

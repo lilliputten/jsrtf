@@ -62,7 +62,7 @@ function testRTF (jsRTF) {
             align : 'center',
             fontSize : 30,
             color : jsRTF.Colors.ORANGE,
-        }),
+        })
         emphasisStyle = new jsRTF.Format({
             color : jsRTF.Colors.darkGreen, // Custom color added above
         }),
