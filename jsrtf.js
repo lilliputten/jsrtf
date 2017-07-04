@@ -12,6 +12,7 @@
 var
     inherit = require('inherit'),
     lib = require('./lib/index'),
+    isArray = Array.isArray,
     NL = '\n'
 ;
 
@@ -66,15 +67,12 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         };
     },/*}}}*/
 
-    /** writeText ** {{{ */
-    writeText : function (text, format, groupName) {
-        var element = new jsRTF.TextElement(text, format);
-        if(groupName !== undefined && this._groupIndex(groupName) >= 0) {
-            this.elements[this._groupIndex(groupName)].push(element);
-        }
-        else {
-            this.elements.push(element);
-        }
+    /** addPara ** {{{ Add paragraph break command (???)
+     * @param {Object} [options]
+     * @param {String} [groupName]
+     */
+    addPara : function (options, groupName) {
+        this.addCommand('\n\\par', groupName, options);
     },/*}}}*/
 
     /** addTable ** {{{
@@ -92,42 +90,94 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         }
     },/*}}}*/
 
-    /** addCommand ** {{{ adds a single command to a given group or as an element
-     * @param {String} command
+    /** addElement ** {{{ adds a single element to a given group or as an element
+     * @param {Object|Array} element
      * @param {String} [groupName]
      * @param {Object} [options]
-     * TODO this should not be in prototype
+     * TODO this should not be in prototype (NOTE: from maintainer?)
      */
-    addCommand : function (command, groupName, options) {
-        // Options...
+    addElement : function (element, groupName, options) {
+
+        // Check for `(command, options)` passed...
         if ( options === undefined && typeof groupName === 'object' ) {
             options = groupName;
             groupName = undefined;
         }
+
+        if ( !element ) {
+            throw new Error('Element not defined');
+        }
+        else if ( isArray(element) ) {
+            element = new lib.ContainerElement(element, options);
+        }
+        else if ( typeof element === 'string' || typeof element === 'number' ) {
+            element = new lib.TextElement(element, options);
+        }
+
+        // Original code...
+        if ( groupName !== undefined && this._groupIndex(groupName)>=0 ) {
+            this.elements[this._groupIndex(groupName)].addElement(element);
+        }
+        else {
+            this.elements.push(element);
+        }
+
+    },/*}}}*/
+
+    /** writeText ** {{{ */
+    writeText : function (text, format, groupName) {
+        var element = new jsRTF.TextElement(text, format);
+        this.addElement(element, groupName);
+    },/*}}}*/
+
+    /** addCommand ** {{{ adds a single command to a given group or as an element
+     * @param {String} command
+     * @param {String} [groupName]
+     * @param {Object} [options]
+     * TODO this should not be in prototype (NOTE: from maintainer?)
+     */
+    addCommand : function (command, groupName, options) {
+
+        if ( !command ) {
+            throw new Error('Command not defined');
+        }
+
+        // Check for `(command, options)` passed...
+        if ( options === undefined && typeof groupName === 'object' ) {
+            options = groupName;
+            groupName = undefined;
+        }
+
+        // If options, then adding them to command
         if ( options && typeof options === 'object' ) {
+            if ( options instanceof lib.Format ) {
+                options.updateTables(this.colorTable, this.fontTable);
+            }
             command +=  ( new jsRTF.Options(options) ).compile();
         }
-        // Original code...
-        if(groupName !== undefined && this._groupIndex(groupName)>=0) {
-            this.elements[this._groupIndex(groupName)].addElement({text:command, safe:false});
-        } else {
-            this.elements.push({text:command, safe:false});
-        }
+
+        var element = {
+            text : command,
+            safe : false,
+        };
+
+        return this.addElement(element);
+
     },/*}}}*/
 
     /** addPage ** {{{ page break shortcut */
     addPage : function (groupName) {
-        this.addCommand("\\page", groupName);
+        this.addCommand('\\page', groupName);
     },/*}}}*/
 
     /** addLine ** {{{ line break shortcut */
     addLine : function (groupName) {
-        this.addCommand("\\line", groupName);
+        this.addCommand('\\line', groupName);
     },/*}}}*/
 
     /** addTab ** {{{ tab shortcut */
     addTab : function (groupName) {
-        this.addCommand("\\tab", groupName);
+        this.addCommand('\\tab', groupName);
     },/*}}}*/
 
     /** addSection ** {{{ Adds section
@@ -139,10 +189,16 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
     },/*}}}*/
 
     /** addOptions ** {{{ Adds options (or styles) ???
-     * @param {Object} [options]
+     * @param {Object} options
      * @param {String} [groupName]
      */
     addOptions : function (options, groupName) {
+        if ( !options ) {
+            throw new Error('Options not defined');
+        }
+        if ( options && options instanceof lib.Format ) {
+            options.updateTables(this.colorTable, this.fontTable);
+        }
         var command = ( new jsRTF.Options(options) ).compile();
         if ( command ) {
             this.addCommand(command, groupName);
@@ -161,23 +217,46 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
         return -1;
     },/*}}}*/
 
+    /** getRTFCode ** {{{ */
+    getRTFCode : function (item) {
+
+        var result = '';
+
+        if ( isArray(item) ) {
+            result = item
+                .map(this.getRTFCode, this)
+                .join('\n')
+            ;
+        }
+        else if ( item instanceof jsRTF.Element ) {
+            result = item.getRTFCode(this.colorTable, this.fontTable);
+        }
+        else {
+            result = jsRTF.Utils.getRTFSafeText(item);
+        }
+
+        return result;
+
+    },/*}}}*/
+
     /** createDocument ** {{{ */
     createDocument : function () {
 
+        // Opening document sequence
         var output = '\{\\rtf1\\ansi\\deff0\n';
 
+        // Document parameters
         var options = new jsRTF.Options(this.params);
         output += options.compile() + NL;
 
-        var elemsContent = this.elements
-            .map(el => ( el instanceof jsRTF.Element ) ? el.getRTFCode(this.colorTable, this.fontTable) : jsRTF.Utils.getRTFSafeText(el))
-            .join('\n')
-        ;
+        // Creating content
+        var elemsContent = this.getRTFCode(this.elements);
 
         //now that the tasks are done running: create tables, data populated during element output
         output += jsRTF.Utils.createColorTable(this.colorTable) + NL;
         output += jsRTF.Utils.createFontTable(this.fontTable) + NL;
 
+        // Finishing document
         output += elemsContent + '\n\}';
 
         return output;

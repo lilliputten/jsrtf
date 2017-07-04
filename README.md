@@ -19,7 +19,7 @@ Using CommonJS:
 ```javascript
     var jsRTF = require('jsrtf');
 ```
-Using YModules:
+Using [YModules](https://www.npmjs.com/package/ym):
 ```javascript
     // require('jsrtf'); // if required
     modules.require(['jsrtf'], (jsRTF) => {

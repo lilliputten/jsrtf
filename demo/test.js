@@ -24,6 +24,11 @@ else {
 
 function testRTF (jsRTF) {
 
+    // Extending color table
+    Object.assign(jsRTF.Colors, {
+        darkGreen : new jsRTF.RGB(0,64,0),
+    });
+
     var
         // Default page margin size (twips)
         pageMargin = 3000,
@@ -43,7 +48,7 @@ function testRTF (jsRTF) {
             marginRight : pageMargin,
         },
         // Calculate content width (for 100% tables, for example)
-        contentWidth = pageOptions.pageWidth - pageOptions.marginLeft - pageOptions.marginRight;
+        contentWidth = pageOptions.pageWidth - pageOptions.marginLeft - pageOptions.marginRight,
         // Create RTF object
         myDoc = new jsRTF(pageOptions)
     ;
@@ -57,7 +62,10 @@ function testRTF (jsRTF) {
             align : 'center',
             fontSize : 30,
             color : jsRTF.Colors.ORANGE,
-        })
+        }),
+        emphasisStyle = new jsRTF.Format({
+            color : jsRTF.Colors.darkGreen, // Custom color added above
+        }),
         textStyle = new jsRTF.Format({
             spaceBefore : 300,
             spaceAfter : 300,
@@ -67,6 +75,20 @@ function testRTF (jsRTF) {
 
     // Adding text styled with formatter
     myDoc.writeText('Title', titleStyle);
+
+    // Adding complex element with inline and default stylings
+    myDoc.addElement([
+        new jsRTF.ContainerElement([
+            new jsRTF.TextElement('Striked ', emphasisStyle),
+            'content',
+        ], { strike : true }),
+        new jsRTF.TextElement(' textStyle ', emphasisStyle),
+        new jsRTF.TextElement(JSON.stringify(textStyle)),
+    ], {
+        paragraph : true,
+        spaceBefore : 500,
+        spaceAfter : 500,
+    });
 
     // Add table
     var cellPadding = 100,
@@ -92,7 +114,7 @@ function testRTF (jsRTF) {
                 bgColor : jsRTF.Colors.RED,
             })),
             cellsFormats : [
-                new jsRTF.Format({ widthRatio : .2, strike : true, bold : true, color : jsRTF.Colors.GREEN }),
+                new jsRTF.Format({ widthRatio : 0.2, strike : true, bold : true, color : jsRTF.Colors.GREEN }),
                 new jsRTF.Format({ widthPercents : 80, underline : true, color : jsRTF.Colors.MAROON }),
             ],
         })
