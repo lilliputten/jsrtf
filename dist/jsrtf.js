@@ -150,11 +150,11 @@ var Format = inherit( /** @lends Format.prototype */{
      * @param {String} text
      * @param {Object} colorTable
      * @param {Object} fontTable
-     * @param {Boolean} [safeText]
+     * @param {Boolean} [escapeText]
      */
-    formatText: function formatText(text, colorTable, fontTable, safeText) {
+    formatText: function formatText(text, colorTable, fontTable, escapeText) {
 
-        safeText === undefined && (safeText = true);
+        escapeText === undefined && (escapeText = true);
 
         this.updateTables(colorTable, fontTable);
 
@@ -162,11 +162,15 @@ var Format = inherit( /** @lends Format.prototype */{
         var optionsStr = options.compile();
 
         // we don't escape text if there are other elements in it, so set a flag
-        if (safeText && typeof text === 'string') {
+        if (escapeText && typeof text === 'string') {
             text = Utils.getRTFSafeText(text);
         }
 
-        var content = [optionsStr, text].join(' ');
+        if (text && !text.match(/^\{.*\}$/)) {
+            text = '{' + text + '}';
+        }
+
+        var content = optionsStr + text;
 
         content = options.applyWrappers(content);
 
@@ -196,6 +200,8 @@ module.exports = Format;
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @module element
  * @overview Base element class
@@ -215,7 +221,10 @@ var Element = inherit({
 
     /** __constructor ** {{{ */
     __constructor: function __constructor(format) {
-        if (format === undefined) {
+        if (format && (typeof format === 'undefined' ? 'undefined' : _typeof(format)) === 'object' && !(format instanceof Format)) {
+            format = new Format(format);
+        }
+        if (!format || format === undefined) {
             format = new Format();
         }
         this.format = format;
@@ -296,7 +305,7 @@ module.exports = {
             throw new Error('Expecting text, not object');
         }
         //this could probably all be replaced by a bit of regex
-        return text.replaceAll('\\', '\\\\').replaceAll('\{', '\\\{').replaceAll('\}', '\\\}').replaceAll('~', '\\~').replaceAll('-', '\\-').replaceAll('_', '\\_')
+        return String(text).replaceAll('\\', '\\\\').replaceAll('\{', '\\\{').replaceAll('\}', '\\\}').replaceAll('~', '\\~').replaceAll('-', '\\-').replaceAll('_', '\\_')
         //turns line breaks into \line commands
         .replaceAll('\n\r', ' \\line ').replaceAll('\n', ' \\line ').replaceAll('\r', ' \\line ');
     }, /*}}}*/
@@ -636,7 +645,7 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
             groupName = undefined;
         }
 
-        if (!element) {
+        if (element === undefined || element === null) {
             throw new Error('Element not defined');
         } else if (isArray(element)) {
             element = new lib.ContainerElement(element, options);
@@ -1390,8 +1399,6 @@ module.exports = ContainerElement;
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /**
  * @module text
  * @overview Text element class
@@ -1404,18 +1411,16 @@ var Element = __webpack_require__(2),
 var TextElement = inherit(Element, {
 
     /** __constructor ** {{{ */
-    __constructor: function __constructor(text, format) {
+    __constructor: function __constructor(text, format, options) {
         // Element.apply(this, [format]);
         this.__base.call(this, format);
-        if (this.format && _typeof(this.format) === 'object' && !(this.format instanceof Format)) {
-            this.format = new Format(this.format);
-        }
         this.text = text;
+        this.options = options || {};
     }, /*}}}*/
 
     /** getRTFCode ** {{{ */
     getRTFCode: function getRTFCode(colorTable, fontTable) {
-        return this.format.formatText(this.text, colorTable, fontTable);
+        return this.format.formatText(this.text, colorTable, fontTable, this.options.escapeText);
     } /*}}}*/
 
 });
@@ -1451,7 +1456,7 @@ var TableElement = inherit(Element, {
      * @param {Object[]} [options.cellsFormats]
      */
     __constructor: function __constructor(options) {
-        this.__base.apply(this, arguments);
+        this.__base.call(this, options && options.format);
         this.data = [];
         Object.assign(this, options);
         this.data || (this.data = []);

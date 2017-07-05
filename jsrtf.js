@@ -104,7 +104,7 @@ var jsRTF = inherit(/** @lends jsRTF.prototype */{
             groupName = undefined;
         }
 
-        if ( !element ) {
+        if ( element === undefined || element === null ) {
             throw new Error('Element not defined');
         }
         else if ( isArray(element) ) {
