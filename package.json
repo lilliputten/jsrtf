@@ -1,8 +1,8 @@
 {
   "name": "jsrtf",
-  "version": "0.0.2b",
+  "version": "0.0.3",
   "description": "Assists with creating rich text documents.",
-  "main": "rtf.js",
+  "main": "lib/index.js",
   "author": "lilliputten <igor@lilliputten.ru>",
   "repository": {
     "type": "git",

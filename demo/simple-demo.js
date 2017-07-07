@@ -8,7 +8,7 @@ if ( typeof modules === 'object' ) {
     require('inherit');
 }
 
-const jsRTF = require('../jsrtf');
+const jsRTF = require('../lib/index');
 
 if ( typeof modules === 'object' ) {
     console.log('Run demo using YM...');
@@ -48,7 +48,7 @@ function testRTF (jsRTF) {
     // Add table
     var table = new jsRTF.TableElement({
         format : new jsRTF.Format({ tableBorder : 10 }),
-        cellsFormats : [
+        cellFormats : [
             new jsRTF.Format({ bold : true }), // #0
             new jsRTF.Format({ color : jsRTF.Colors.RED }), // #1
         ],

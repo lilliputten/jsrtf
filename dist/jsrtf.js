@@ -585,6 +585,15 @@ var jsRTF = inherit( /** @lends jsRTF.prototype */{
             Object.assign(this.params, this._getDefaultParams());
         }
         Object.assign(this.params, params);
+
+        // Stores the elements
+        this.elements = [];
+
+        // Stores the colors
+        this.colorTable = [];
+
+        // Stores the fonts
+        this.fontTable = [];
     }, /*}}}*/
 
     /** _getDefaultParams ** {{{ */

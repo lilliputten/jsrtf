@@ -46,3 +46,7 @@ Paragraph border styles:
 - `\brdremboss` 	Emboss border.
 - `\brdrengrave` 	Engrave border.
 
+- `\vertalt` 	Text is top-aligned (the default).
+- `\vertalb` 	Text is bottom-aligned.
+- `\vertalc` 	Text is centered vertically.
+- `\vertalj` 	Text is justified vertically.
