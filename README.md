@@ -92,6 +92,7 @@ Examples
 
     // Formatter object
     var
+        defaultFontSize = 12,
         titleStyle = new jsRTF.Format({
             spaceBefore : 500,
             spaceAfter : 500,
@@ -99,8 +100,8 @@ Examples
             align : 'center',
             fontSize : 30,
             color : jsRTF.Colors.ORANGE,
-            borderBottom : { type : 'single', width : 10, spacing : 100 },
-            borderColor : jsRTF.Colors.RED,
+            border : { type : 'single', width : 10, color : jsRTF.Colors.RED },
+            // borderColor : jsRTF.Colors.RED,
             borderTop : { type : 'double', width : 50, spacing : 100, color : jsRTF.Colors.GREEN },
         }),
         emphasisStyle = new jsRTF.Format({
@@ -110,6 +111,8 @@ Examples
             spaceBefore : 300,
             spaceAfter : 300,
             paragraph : true,
+            fontSize : defaultFontSize,
+            color : jsRTF.Colors.BLACK,
         })
     ;
 
@@ -140,26 +143,35 @@ Examples
         },
         table = new jsRTF.TableElement({
             format : new jsRTF.Format({
-                tableBorder : 10,
+                // tableBorder : 10,
                 tableWidth : contentWidth,
             }),
             rowFormat : new jsRTF.Format(Object.assign({}, cellBaseProps, {
-                color : jsRTF.Colors.GRAY,
+                // rowBorderTop : { type : 'single', width : 10, color : jsRTF.Colors.GREEN }, // ???
+                // strike : true,
+                // color : jsRTF.Colors.GRAY,
             })),
             firstRowFormat : new jsRTF.Format(Object.assign({}, cellBaseProps, {
+                cellVerticalAlign : 'bottom',
                 tableHeader : true,
                 bold : false,
                 color : jsRTF.Colors.WHITE,
-                bgColor : jsRTF.Colors.RED,
+                cellBgColor : jsRTF.Colors.RED,
             })),
-            cellsFormats : [
+            cellFormat : new jsRTF.Format({
+                cellBorderRight : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderTop : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderLeft : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderBottom : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+            }),
+            cellFormats : [
                 new jsRTF.Format({ widthRatio : 0.2, strike : true, bold : true, color : jsRTF.Colors.GREEN }),
                 new jsRTF.Format({ widthPercents : 80, underline : true, color : jsRTF.Colors.MAROON }),
             ],
         })
     ;
     // Add rows
-    table.addRow([ 'Table row', 'with two columns' ]);
+    table.addRow([ 'Table row', 'with two\ncolumns' ]);
     table.addRow([ 'Second row', 'and the second column' ]);
     myDoc.addTable(table);
 
