@@ -7,8 +7,8 @@ module.exports = {
   context: __dirname,
   devtool: 'source-map',
   entry: {
-    'jsrtf': './jsrtf.js',
-    'jsrtf.min': './jsrtf.js',
+    'jsrtf': './lib/index.js',
+    'jsrtf.min': './lib/index.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

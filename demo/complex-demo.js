@@ -109,6 +109,7 @@ function testRTF (jsRTF) {
                 tableWidth : contentWidth,
             }),
             rowFormat : new jsRTF.Format(Object.assign({}, cellBaseProps, {
+                // rowBorderTop : { type : 'single', width : 10, color : jsRTF.Colors.GREEN }, // ???
                 // strike : true,
                 // color : jsRTF.Colors.GRAY,
             })),
@@ -117,10 +118,13 @@ function testRTF (jsRTF) {
                 tableHeader : true,
                 bold : false,
                 color : jsRTF.Colors.WHITE,
-                bgColor : jsRTF.Colors.RED,
+                cellBgColor : jsRTF.Colors.RED,
             })),
             cellFormat : new jsRTF.Format({
-                cellBorder : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderRight : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderTop : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderLeft : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
+                cellBorderBottom : { type : 'single', width : 10, color : jsRTF.Colors.BLACK },
             }),
             cellFormats : [
                 new jsRTF.Format({ widthRatio : 0.2, strike : true, bold : true, color : jsRTF.Colors.GREEN }),
