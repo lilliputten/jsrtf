@@ -21,23 +21,19 @@ module.exports = {
     })
   ],
   module: {
-  loaders: [
-    {
-      loader: 'babel-loader',
-      // Skip any files outside of your project's `src` directory
-      include: [
-        __dirname,
-      ],
-      // Options to configure babel with
-      query: {
-        // plugins: ['transform-runtime'],
-        presets: ['es2015', 'stage-0'],
-      }
-    },
-  ],
+    loaders: [
+      {
+        loader: 'babel-loader',
+        // Skip any files outside of your project's `src` directory
+        include: [
+          __dirname,
+        ],
+        // Options to configure babel with
+        query: {
+          // plugins: ['transform-runtime'],
+          presets: ['es2015', 'stage-0'],
+        }
+      },
+    ],
   },
-  // devServer: {
-  //   inline:true,
-  //   port: 10000,
-  // },
 };
